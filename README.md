@@ -1,1 +1,156 @@
-# dreamzameen
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DreamZameen AI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #chatbox-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 320px;
+      max-height: 480px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      display: none;
+      flex-direction: column;
+      z-index: 9999;
+      overflow: hidden;
+      border: 1px solid #ccc;
+    }
+    #chatbox-header {
+      background: #2a5b7d;
+      color: white;
+      padding: 12px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #chatbox-header span {
+      cursor: pointer;
+    }
+    #chatbox-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      background: #f9f9f9;
+    }
+    #chatbox-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    #chatbox-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+    #chatbox-input button {
+      background: #2a5b7d;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+    #chatbot-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #2a5b7d;
+      color: white;
+      border-radius: 50%;
+      border: none;
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 9999;
+    }
+    .bot-msg {
+      background: #eef3f7;
+      padding: 8px 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+    }
+    .user-msg {
+      background: #d4e8ff;
+      padding: 8px 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to DreamZameen</h1>
+  <p>Find your dream home using our AI Assistant!</p>
+
+  <div id="chatbox-container">
+    <div id="chatbox-header">
+      Dream AI Assistant
+      <span onclick="toggleChatbox()">×</span>
+    </div>
+    <div id="chatbox-messages">
+      <div class="bot-msg">Hi! I'm Dream AI. What kind of property are you looking for?</div>
+    </div>
+    <div id="chatbox-input">
+      <input type="text" id="userInput" placeholder="Type your question..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <button id="chatbot-toggle" onclick="toggleChatbox()">💬</button>
+
+  <script>
+    function toggleChatbox() {
+      const chatbox = document.getElementById("chatbox-container");
+      chatbox.style.display = chatbox.style.display === "flex" ? "none" : "flex";
+      chatbox.style.flexDirection = "column";
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const messages = document.getElementById("chatbox-messages");
+
+      const userDiv = document.createElement("div");
+      userDiv.className = "user-msg";
+      userDiv.textContent = text;
+      messages.appendChild(userDiv);
+      input.value = "";
+
+      fetch("https://dreamzameenai.armantariq246.repl.co/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const botDiv = document.createElement("div");
+        botDiv.className = "bot-msg";
+        botDiv.innerHTML = data.reply || "AI couldn't respond.";
+        messages.appendChild(botDiv);
+        messages.scrollTop = messages.scrollHeight;
+      })
+      .catch(() => {
+        const botDiv = document.createElement("div");
+        botDiv.className = "bot-msg";
+        botDiv.innerHTML = "❌ Failed to connect to AI backend.";
+        messages.appendChild(botDiv);
+        messages.scrollTop = messages.scrollHeight;
+      });
+    }
+  </script>
+</body>
+</html>
